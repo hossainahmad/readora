@@ -1,4 +1,7 @@
+import Link from "next/link";
+
 interface BookCardProps {
+  slug: string;
   title: string;
   author: string;
   coverUrl: string;
@@ -7,6 +10,7 @@ interface BookCardProps {
 }
 
 export default function BookCard({
+  slug,
   title,
   author,
   coverUrl,
@@ -14,7 +18,10 @@ export default function BookCard({
   category,
 }: BookCardProps) {
   return (
-    <div className="group overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-sm transition hover:shadow-md">
+    <Link
+      href={`/books/${slug}`}
+      className="group block overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-sm transition hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-800"
+    >
       <div className="aspect-2/3 overflow-hidden bg-neutral-100">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
@@ -29,10 +36,10 @@ export default function BookCard({
             {category}
           </span>
         )}
-        <h3 className="mt-1 truncate font-semibold">{title}</h3>
+        <h2 className="mt-1 truncate font-semibold">{title}</h2>
         <p className="truncate text-sm text-neutral-500">{author}</p>
         <p className="text-sm text-amber-500">★ {rating.toFixed(1)}</p>
       </div>
-    </div>
+    </Link>
   );
 }

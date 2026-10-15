@@ -3,7 +3,7 @@ A web platform where visitors can discover, search, and read books online.
 
 1. Project Overview
    Goal: Beautiful card-based browsing, powerful search/filtering, and adistraction-free, eye-comfortable reading experience with social login.
-   Status: Phase 1 complete ✅
+   Status: Phases 1–2 complete ✅
 2. Tech Stack
    Layer Choice Why
    Framework Next.js (React, TypeScript) SEO-friendly SSR, API routes built-in
@@ -37,12 +37,12 @@ A web platform where visitors can discover, search, and read books online.
 4. Routes / Pages
    Route Purpose Status
    / Home: featured books, hero, search ✅ Built
-   /books Browse all + filters + sort Phase 2
-   /books/[slug] Book details Phase 2
-   /authors All authors Phase 2
-   /authors/[slug] Author bio + books Phase 2
-   /categories All categories Phase 2
-   /categories/[slug] Books in a category Phase 2
+   /books Browse all + filters + sort ✅ Built
+   /books/[slug] Book details ✅ Built
+   /authors All authors ✅ Built
+   /authors/[slug] Author bio + books ✅ Built
+   /categories All categories ✅ Built
+   /categories/[slug] Books in a category ✅ Built
    /read/[bookSlug]/[chapter] Reader UI Phase 3
    /login Auth page (smoke test ✅, polish in Phase 4) 🔧
    /dashboard User library, progress, settings Phase 4
@@ -86,12 +86,12 @@ Seed script — 10 books, 10 authors, 8 categories
 Layout: Navbar (live session state), Footer, BookCard
 Home page with featured books from DB
 /login smoke-test page
-Phase 2 — Discovery ← NEXT
+Phase 2 — Discovery ✅ DONE
 
-/books browse page: search, category filter, sorting
-Book detail page
-Authors & categories pages + detail pages
-Link BookCard → book detail
+/books browse page: search, category filter, sorting ✅
+Book detail page ✅
+Authors & categories pages + detail pages ✅
+Link BookCard → book detail ✅
 Phase 3 — Reader
 
 Reader UI with themes & typography controls

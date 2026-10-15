@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getDb } from "@/lib/db";
 import BookCard from "@/components/BookCard";
 
@@ -23,28 +24,36 @@ export default async function HomePage() {
             Browse a growing library and read in a comfortable, distraction-free
             reader.
           </p>
-          <div className="mx-auto mt-8 max-w-md">
+          <form action="/books" className="mx-auto mt-8 flex max-w-md gap-2">
             <input
-              type="text"
-              placeholder="Search books & authors… (coming in Phase 2)"
-              disabled
-              className="w-full rounded-full border border-neutral-300 bg-white px-5 py-3 text-sm outline-none"
+              type="search"
+              name="q"
+              aria-label="Search books and authors"
+              placeholder="Search books and authors"
+              className="min-w-0 flex-1 rounded border border-neutral-300 bg-white px-4 py-3 text-sm outline-none focus:border-amber-700 focus:ring-2 focus:ring-amber-100"
             />
-          </div>
+            <button className="rounded bg-neutral-900 px-4 text-sm font-medium text-white hover:bg-neutral-700">
+              Search
+            </button>
+          </form>
         </div>
       </section>
 
       <section className="mx-auto max-w-6xl px-4 py-10">
         <div className="flex items-end justify-between">
           <h2 className="text-2xl font-bold">Featured Books</h2>
-          <span className="text-sm text-neutral-500">
-            Browse all → (Phase 2)
-          </span>
+          <Link
+            href="/books"
+            className="text-sm font-medium text-amber-800 underline underline-offset-4"
+          >
+            Browse all
+          </Link>
         </div>
         <div className="mt-6 grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-4">
           {books.map((b) => (
             <BookCard
               key={b._id.toString()}
+              slug={b.slug}
               title={b.title}
               author={b.author_name}
               coverUrl={b.cover_url}
