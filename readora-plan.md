@@ -3,7 +3,7 @@ A web platform where visitors can discover, search, and read books online.
 
 1. Project Overview
    Goal: Beautiful card-based browsing, powerful search/filtering, and adistraction-free, eye-comfortable reading experience with social login.
-   Status: Phases 1–2 complete; Phase 3 implemented ✅
+   Status: Phases 1–4 implemented ✅
 2. Tech Stack
    Layer Choice Why
    Framework Next.js (React, TypeScript) SEO-friendly SSR, API routes built-in
@@ -45,7 +45,7 @@ A web platform where visitors can discover, search, and read books online.
    /categories/[slug] Books in a category ✅ Built
    /read/[bookSlug]/[chapter] Reader UI ✅ Implemented (sample chapters require seeding)
    /login Auth page (smoke test ✅, polish in Phase 4) 🔧
-   /dashboard User library, progress, settings Phase 4
+   /dashboard User library, progress, settings ✅ Built
    /admin Content management (role-gated) Phase 5
 5. Reader UI — Eye Comfort Guidelines
    Themes: Light, Sepia, Dark (warm-tinted dark, not pure black)
@@ -98,11 +98,12 @@ Reader UI with themes & typography controls ✅
 Chapter navigation + progress bar ✅
 Two original sample chapters per book added to seed data ✅
 Reading preferences and progress persist in this browser; account sync is Phase 4.
-Phase 4 — Auth & Users
+Phase 4 — Auth & Users ✅ IMPLEMENTED
 
-Polish login page + error handling
-Dashboard, library shelves
-Reading progress sync
+Polish login page + error handling ✅
+Dashboard, library shelves ✅
+Reading progress sync across devices ✅
+OAuth providers require configured client IDs and secrets in `.env.local`.
 Phase 5 — Community & Admin
 
 Ratings/reviews, bookmarks

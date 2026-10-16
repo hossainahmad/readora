@@ -12,6 +12,13 @@ interface ReaderChapterLink {
   title: string;
 }
 
+interface SavedReadingProgress {
+  chapterOrder: number;
+  position: number;
+  percent: number;
+  updatedAt: string;
+}
+
 interface ReaderExperienceProps {
   bookSlug: string;
   bookTitle: string;
@@ -22,6 +29,8 @@ interface ReaderExperienceProps {
   previousOrder?: number;
   nextOrder?: number;
   isSample: boolean;
+  isAuthenticated: boolean;
+  initialProgress: SavedReadingProgress | null;
 }
 
 const defaultPreferences = {
@@ -47,6 +56,8 @@ export default function ReaderExperience({
   previousOrder,
   nextOrder,
   isSample,
+  isAuthenticated,
+  initialProgress,
 }: ReaderExperienceProps) {
   const router = useRouter();
   const articleRef = useRef<HTMLElement>(null);
@@ -122,32 +133,79 @@ export default function ReaderExperience({
             );
       setChapterProgress(fraction);
 
+      const savedProgress = {
+        chapterOrder,
+        position: window.scrollY,
+        percent: Math.round(
+          ((Math.max(0, currentChapterIndex) + fraction) / chapters.length) *
+            100,
+        ),
+        updatedAt: new Date().toISOString(),
+      };
+
       try {
-        localStorage.setItem(
-          progressKey,
-          JSON.stringify({
-            chapterOrder,
-            position: window.scrollY,
-            percent: Math.round(
-              ((Math.max(0, currentChapterIndex) + fraction) /
-                chapters.length) *
-                100,
-            ),
-          }),
-        );
+        localStorage.setItem(progressKey, JSON.stringify(savedProgress));
       } catch {
         // Progress still updates in the current page if storage is unavailable.
       }
+
+      if (isAuthenticated) {
+        pendingProgress = savedProgress;
+        window.clearTimeout(syncTimeout);
+        syncTimeout = window.setTimeout(() => {
+          void syncProgress(savedProgress);
+          pendingProgress = null;
+        }, 900);
+      }
     };
 
+    let syncTimeout: number;
+    let pendingProgress: SavedReadingProgress | null = null;
+    const syncProgress = (
+      savedProgress: SavedReadingProgress,
+      keepalive = false,
+    ) =>
+      fetch("/api/reading-progress", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ bookSlug, ...savedProgress }),
+        keepalive,
+      }).catch(() => undefined);
+
     const frame = window.requestAnimationFrame(() => {
+      let localProgress: SavedReadingProgress | null = null;
       try {
         const saved = JSON.parse(localStorage.getItem(progressKey) ?? "null");
-        if (saved?.chapterOrder === chapterOrder && saved.position > 0) {
-          window.scrollTo({ top: saved.position, behavior: "auto" });
+        if (
+          Number.isInteger(saved?.chapterOrder) &&
+          Number.isFinite(saved?.position) &&
+          saved.position >= 0
+        ) {
+          localProgress = {
+            chapterOrder: saved.chapterOrder,
+            position: saved.position,
+            percent: Number(saved.percent) || 0,
+            updatedAt:
+              typeof saved.updatedAt === "string"
+                ? saved.updatedAt
+                : "1970-01-01T00:00:00.000Z",
+          };
         }
       } catch {
         setChapterProgress(0);
+      }
+
+      const localIsNewer =
+        localProgress &&
+        (!initialProgress ||
+          Date.parse(localProgress.updatedAt) >
+            Date.parse(initialProgress.updatedAt));
+      const savedProgress = localIsNewer ? localProgress : initialProgress;
+      if (
+        savedProgress?.chapterOrder === chapterOrder &&
+        savedProgress.position > 0
+      ) {
+        window.scrollTo({ top: savedProgress.position, behavior: "auto" });
       }
       measureProgress();
     });
@@ -156,6 +214,10 @@ export default function ReaderExperience({
     window.addEventListener("resize", measureProgress);
     return () => {
       window.cancelAnimationFrame(frame);
+      window.clearTimeout(syncTimeout);
+      if (pendingProgress && isAuthenticated) {
+        void syncProgress(pendingProgress, true);
+      }
       window.removeEventListener("scroll", measureProgress);
       window.removeEventListener("resize", measureProgress);
     };
@@ -165,6 +227,8 @@ export default function ReaderExperience({
     chapters.length,
     currentChapterIndex,
     progressKey,
+    isAuthenticated,
+    initialProgress,
   ]);
 
   useEffect(() => {

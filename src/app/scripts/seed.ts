@@ -430,6 +430,12 @@ async function seed() {
     .createIndex({ book_id: 1, order: 1 }, { unique: true });
   await db.collection("authors").createIndex({ slug: 1 }, { unique: true });
   await db.collection("categories").createIndex({ slug: 1 }, { unique: true });
+  await db
+    .collection("library")
+    .createIndex({ user_id: 1, book_id: 1 }, { unique: true });
+  await db
+    .collection("reading_progress")
+    .createIndex({ user_id: 1, book_id: 1 }, { unique: true });
 
   console.log(
     `Seeded ${books.length} books, ${authors.length} authors, ${categories.length} categories, and ${chapterDocuments.length} sample chapters`,

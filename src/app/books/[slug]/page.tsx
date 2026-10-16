@@ -2,6 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import BookCard from "@/components/BookCard";
 import { getDb } from "@/lib/db";
+import LibraryAction from "@/components/LibraryAction";
+import { getSession } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
 
@@ -22,6 +24,14 @@ export default async function BookDetailPage({ params }: BookPageProps) {
   const db = await getDb();
   const book = await db.collection("books").findOne({ slug });
   if (!book) notFound();
+
+  const session = await getSession();
+  const libraryEntry = session
+    ? await db.collection("library").findOne({
+        user_id: session.user.id,
+        book_id: book._id,
+      })
+    : null;
 
   const categorySlugs: string[] = book.category_slugs ?? [];
   const [author, categories, similarBooks, chapters] = await Promise.all([
@@ -94,6 +104,17 @@ export default async function BookDetailPage({ params }: BookPageProps) {
           <p className="mt-6 max-w-2xl leading-7 text-neutral-700">
             {book.description}
           </p>
+          <LibraryAction
+            bookSlug={book.slug}
+            initialStatus={
+              libraryEntry &&
+              ["want_to_read", "reading", "finished"].includes(
+                libraryEntry.status,
+              )
+                ? libraryEntry.status
+                : null
+            }
+          />
           <dl className="mt-7 grid max-w-md grid-cols-2 gap-x-6 gap-y-4 border-y border-neutral-200 py-5 text-sm">
             {book.published_year && (
               <div>

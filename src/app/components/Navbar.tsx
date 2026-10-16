@@ -29,6 +29,12 @@ export default function Navbar() {
         <div className="ml-auto flex items-center gap-3">
           {isPending ? null : session ? (
             <>
+              <Link
+                href="/dashboard"
+                className="text-sm font-medium text-neutral-700 hover:text-neutral-950"
+              >
+                My library
+              </Link>
               <span className="text-sm text-neutral-600">
                 {session.user.name}
               </span>

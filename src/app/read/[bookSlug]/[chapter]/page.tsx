@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import ReaderExperience from "@/components/ReaderExperience";
 import { getDb } from "@/lib/db";
+import { getSession } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
 
@@ -46,6 +47,14 @@ export default async function ReaderPage({ params }: ReaderPageProps) {
   if (currentIndex < 0) notFound();
 
   const activeChapter = chapters[currentIndex];
+  const session = await getSession();
+  const savedProgress = session
+    ? await db.collection("reading_progress").findOne({
+        user_id: session.user.id,
+        book_id: book._id,
+      })
+    : null;
+
   return (
     <ReaderExperience
       bookSlug={book.slug}
@@ -64,6 +73,20 @@ export default async function ReaderPage({ params }: ReaderPageProps) {
       previousOrder={chapters[currentIndex - 1]?.order}
       nextOrder={chapters[currentIndex + 1]?.order}
       isSample={activeChapter.is_sample === true}
+      isAuthenticated={Boolean(session)}
+      initialProgress={
+        savedProgress
+          ? {
+              chapterOrder: Number(savedProgress.chapter_order) || 1,
+              position: Number(savedProgress.position) || 0,
+              percent: Number(savedProgress.percent) || 0,
+              updatedAt:
+                savedProgress.updated_at instanceof Date
+                  ? savedProgress.updated_at.toISOString()
+                  : new Date(savedProgress.updated_at ?? 0).toISOString(),
+            }
+          : null
+      }
     />
   );
 }
