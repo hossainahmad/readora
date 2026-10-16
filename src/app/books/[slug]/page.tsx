@@ -24,7 +24,7 @@ export default async function BookDetailPage({ params }: BookPageProps) {
   if (!book) notFound();
 
   const categorySlugs: string[] = book.category_slugs ?? [];
-  const [author, categories, similarBooks] = await Promise.all([
+  const [author, categories, similarBooks, chapters] = await Promise.all([
     db.collection("authors").findOne({ slug: book.author }),
     db
       .collection("categories")
@@ -42,6 +42,11 @@ export default async function BookDetailPage({ params }: BookPageProps) {
           .limit(4)
           .toArray()
       : Promise.resolve([]),
+    db
+      .collection("chapters")
+      .find({ book_id: book._id })
+      .sort({ order: 1 })
+      .toArray(),
   ]);
 
   return (
@@ -109,6 +114,19 @@ export default async function BookDetailPage({ params }: BookPageProps) {
               </div>
             )}
           </dl>
+          {chapters[0] && (
+            <div className="mt-6 flex flex-wrap items-center gap-4">
+              <Link
+                href={`/read/${book.slug}/${chapters[0].order}`}
+                className="rounded bg-neutral-900 px-5 py-3 text-sm font-semibold text-white hover:bg-neutral-700"
+              >
+                Read preview
+              </Link>
+              <span className="text-sm text-neutral-500">
+                {chapters.length} sample chapters
+              </span>
+            </div>
+          )}
           {categories.length > 0 && (
             <div className="mt-5 flex flex-wrap gap-x-4 gap-y-2 text-sm">
               {categories.map((category) => (
